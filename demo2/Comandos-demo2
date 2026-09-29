@@ -1,0 +1,51 @@
+## DEMO 2 - Node Apps HA Nginx y Redis
+
+## Les dejo lo que hicimos en la demo2, de aca son libres para jugar y consultar (prueben comandos con la opcion "help" para aprender mas de la tool).
+## En mi caso uso QEMU/KVM corriendo en version local, pero se puede correr sobre otros VMM.
+
+## Bajamos la consola de NanoVMs (OPS)
+curl https://ops.city/get.sh -sSfL | sh 
+ops --help
+
+## Armamos las imagenes base de las aplicaciones del ZIP.   (ACUERDENSE DE ABRIR EL ZIP ANTES POR EL NODE MODULES...)
+
+Imagen de REDIS, APPSERVER1, APPSERVER2 y NGINX  (Si la version del package no va, buscan una mas nueva con "ops pkg list | grep nginx" o "redis" o "node")
+
+ops image create --package eyberg/redis:5.0.5 -c redis.json -i redis-demo
+ops image create --package eyberg/node:20.5.0 -c node1.json -i appserver1
+ops image create --package eyberg/node:20.5.0 -c node2.json -i appserver2
+ops image create --package eyberg/nginx:1.15.6 -c nginx.json -i nginx-demo
+
+---------------------------
+
+## Vemos el listado de las imagenes creadas con el tamaño. Usen "ops image help" y chusmeen con tree o ls.
+ops image list  
+
+## Creemos las instancias como hicimos en la demo 1, usando las imagenes base, exponiendolas en local y dandoles nombre
+
+ops instance create redis-demo -p 6379 -i redis
+ops instance create appserver2 -i appsrv-2 -p 8082
+ops instance create appserver1 -i appsrv-1 -p 8081
+ops instance create nginx-demo -i nginx -p 8000
+
+## Veamos lo que hicimos y juguemos un poco con estos unikernels
+
+ops instance list
+ops instance logs redis
+ops instance logs appsrv-1
+
+## Limpiemos lo que hicimos y borremos las imagenes
+
+ops instance delete redis
+ops instance delete appsrv-1
+ops instance delete appsrv-2
+ops instance delete nginx
+ops instance list
+
+ops image delete appserver1
+ops image delete appserver2
+ops image delete redis-demo
+ops image delete nginx-demo
+ops image list
+
+## Aprovechen para jugar, revisen las metricas en el path /metrics, revisen la conexion al redis, los archivos de configuración, etc!
