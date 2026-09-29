@@ -1,0 +1,33 @@
+## DEMO PYTHON - Levantar Webserver Python en unikernel
+
+## Les dejo lo que hicimos en la demo, de aca son libres para jugar y consultar (prueben comandos con la opcion "help" para aprender mas de la tool).
+## En mi caso uso QEMU/KVM corriendo en version local, pero se puede correr sobre otros VMM.
+
+## Bajamos la consola de NanoVMs (OPS)
+curl https://ops.city/get.sh -sSfL | sh 
+ops --help
+
+## Ejecutar el binario a mano compilando mi app con el package de Python precompilado
+##utilizamos el paquete "eyberg/python:3.6.7" con los argumentos "server.py" y lo exponemos en el puerto 9000 de localhost
+
+ops pkg load eyberg/python:3.9.7 -p 9000 -a server.py   >>> Si no figura la 3.9.7, buscamos otra [ops pkg list | grep python]
+
+curl -s http://localhost:9000/   >>> Testeamos el Site por acá o por navegador!
+
+## Armamos una imagen
+## Imagen generada con el mismo paquete, argumento "server.py" y nombre de imagen "python-demo"
+
+ops image create --package eyberg/python:3.6.7 -a server.py -i python-demo
+ops image tree python-demo >>> Chusmeamos los binarios que compilamos en la imagen
+
+## Creamos una instancia a partir de la imagen que definimos (python-demo), con nombre "Python" y exponemos en el puerto 9000 de localhost.
+ops instance create python-demo -i python -p 9000
+
+ops instance list          >>>   Vemos las instancias activas
+
+curl -s http://localhost:9000/   >>> Testeamos el Site por acá o por navegador!
+
+ops instance logs python   >>>   Vemos los logs de la instancia de nombre "python"
+ops instance delete python >>>   Eliminamos la VM "python"
+
+
